@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SC-900 Practice Exam Simulator</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 700px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background: #f0f4f8;
+    color: #222;
+  }
+  h1, h2 {
+    text-align: center;
+  }
+  #start-screen, #question-container, #score-container {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+    margin-bottom: 1rem;
+  }
+  #start-screen {
+    display: block;
+  }
+  #question-container, #score-container {
+    display: none;
+  }
+  #question-text {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+  .answer-btn {
+    display: block;
+    width: 100%;
+    margin: 0.4rem 0;
+    padding: 0.7rem;
+    font-size: 1rem;
+    border: 1px solid #0078d4;
+    background: white;
+    color: #0078d4;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  .answer-btn:hover {
+    background-color: #0078d4;
+    color: white;
+  }
+  .answer-btn.correct {
+    background-color: #28a745;
+    color: white;
+    border-color: #28a745;
+  }
+  .answer-btn.incorrect {
+    background-color: #dc3545;
+    color: white;
+    border-color: #dc3545;
+  }
+  #next-btn, #start-btn, #restart-btn {
+    margin-top: 1rem;
+    padding: 0.7rem 1.5rem;
+    font-size: 1.1rem;
+    background-color: #0078d4;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  #timer {
+    font-weight: bold;
+    float: right;
+  }
+  /* Drag & Drop styles */
+  .match-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  .match-list {
+    background: #e9ecef;
+    border-radius: 5px;
+    padding: 1rem;
+    flex: 1;
+    min-height: 200px;
+  }
+  .match-list h4 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+  }
+  .draggable-item {
+    background: white;
+    border: 1px solid #0078d4;
+    padding: 0.5rem;
+    margin: 0.4rem 0;
+    border-radius: 4px;
+    cursor: grab;
+  }
+  .droppable-item {
+    background: white;
+    border: 1px dashed #0078d4;
+    padding: 0.5rem;
+    margin: 0.4rem 0;
+    border-radius: 4px;
+    min-height: 34px;
+  }
+  .droppable-item.filled {
+    border-style: solid;
+  }
+  .droppable-item.correct {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
+  }
+  .droppable-item.incorrect {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+  }
+  button#check-match-btn {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: #0078d4;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  button#check-match-btn:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+  }
+  #stats {
+    margin-top: 1rem;
+    font-size: 1rem;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<h1>SC-900 Practice Exam Simulator</h1>
+
+<div id="start-screen">
+  <h2>Welcome! Choose number of questions to attempt:</h2>
+  <select id="num-questions-select">
+    <option value="10">10 questions</option>
+    <option value="20" selected>20 questions</option>
+    <option value="50">50 questions</option>
+    <option value="100">100 questions</option>
+    <option value="all">All questions</option>
+  </select>
+  <br/>
+  <button id="start-btn">Start Quiz</button>
+  <div id="stats"></div>
+</div>
+
+<div id="question-container">
+  <div id="timer">Time: 30s</div>
+  <div id="question-text"></div>
+  <div id="answer-buttons"></div>
+
+  <div id="matching-container" style="display:none;">
+    <div class="match-container">
+      <div class="match-list" id="match-left">
+        <h4>Terms</h4>
+      </div>
+      <div class="match-list" id="match-right">
+        <h4>Definitions</h4>
+      </div>
+    </div>
+    <button id="check-match-btn" disabled>Check Answer</button>
+  </div>
+
+  <button id="next-btn">Next Question</button>
+</div>
+
+<div id="score-container">
+  <h2>Quiz Complete!</h2>
+  <p id="final-score"></p>
+  <button id="restart-btn">Restart</button>
+</div>
+
+<script>
+  // Questions sample (about 50 to start, expand as needed)
+  const questionsMaster = [
+    {
+      type: "multiple-choice",
+      question: "What is the primary goal of Microsoft Information Protection (MIP)?",
+      answers: [
+        { text: "To manage device inventory", correct: false },
+        { text: "To classify, label, and protect sensitive data", correct: true },
+        { text: "To monitor network traffic", correct: false },
+        { text: "To automate user onboarding", correct: false }
+      ]
+    },
+    {
+      type: "multiple-choice",
+      question: "Which Microsoft compliance framework is NOT currently supported by Compliance Manager?",
+      answers: [
+        { text: "GDPR", correct: false },
+        { text: "ISO 27001", correct: false },
+        { text: "PCI-DSS", correct: true },
+        { text: "HIPAA", correct: false }
+      ]
+    },
+    {
+      type: "matching",
+      question: "Match the Microsoft service to its description.",
+      pairs: [
+        { left: "Azure AD Identity Protection", right: "Detects risky sign-ins and compromised accounts" },
+        { left: "Microsoft Intune", right: "Manages devices and enforces compliance policies" },
+        { left: "Microsoft Sentinel", right: "Cloud-native security information and event management (SIEM)" },
+        { left: "Azure AD Privileged Identity Management (PIM)", right: "Provides just-in-time admin access with approval workflows" }
+      ]
+    },
+    {
+      type: "multiple-choice",
+      question: "True or False: Microsoft Defender for Cloud Apps helps discover and control shadow IT in your organization.",
+      answers: [
+        { text: "True", correct: true },
+        { text: "False", correct: false }
+      ]
+    },
+    {
+      type: "multiple-choice",
+      question: "Which Microsoft 365 compliance feature enables automated detection of sensitive info and data classification?",
+      answers: [
+        { text: "Data Loss Prevention (DLP)", correct: true },
+        { text: "Microsoft Sentinel", correct: false },
+        { text: "Azure AD Identity Protection", correct: false },
+        { text: "Microsoft Defender for Endpoint", correct: false }
+      ]
+    },
+    {
+      type: "multiple-choice",
+      question: "What does B2B stand for in Microsoft security context?",
+      answers: [
+        { text: "Business to Business", correct: true },
+        { text: "Business to Consumer", correct: false },
+        { text: "Back to Backend", correct: false },
+        { text: "Basic to Business", correct: false }
+      ]
+    },
+    {
+      type: "multiple-choice",
+      question: "Which feature provides just-in-time administrative access in Azure AD?",
+      answers: [
+        { text: "Privileged Identity Management (PIM)", correct: true },
+        { text: "Azure Security Center", correct: false },
+        { text: "Conditional Access", correct: false },
+        { text: "Azure Sentinel", correct: false }
+      ]
+    },
+    {
+      type: "multiple-choice",
+      question: "Which service is primarily used for mobile device management in Microsoft 365?",
+      answers: [
+        { text: "Microsoft Intune", correct: true },
+        { text: "Azure Sentinel", correct: false },
+        { text: "Microsoft Defender for Endpoint", correct: false },
+        { text: "Azure AD Identity Protection", correct: false }
+      ]
+    },
+    {
+      type: "multiple-choice",
+      question: "True or False: Azure Security Center and Microsoft Defender for Cloud are the same product.",
+      answers: [
+        { text: "True", correct: true },
+        { text: "False", correct: false }
+      ]
+    },
+    {
+      type: "multiple-choice",
+      question: "Which compliance solution helps to manage data retention policies across Microsoft 365?",
+      answers: [
+        { text: "Microsoft Information Governance", correct: true },
+        { text: "Azure Sentinel", correct: false },
+        { text: "Microsoft Defender for Cloud Apps", correct: false },
+        { text: "Azure AD Conditional Access", correct: false }
+      ]
+    },
+    // Add many more questions here (just duplicate and modify for your purposes)
+    // ...
+  ];
+
+  // Save past results in localStorage key "sc900Results" as array of {date, score, total}
+  const storageKey = "sc900Results";
+
+  const startScreen = document.getElementById("start-screen");
+  const questionContainer = document.getElementById("question-container");
+  const scoreContainer = document.getElementById("score-container");
+
+  const questionText = document.getElementById("question-text");
+  const answerButtons = document.getElementById("answer-buttons");
+  const nextBtn = document.getElementById("next-btn");
+  const timerDisplay = document.getElementById("timer");
+
+  const matchingContainer = document.getElementById("matching-container");
+  const matchLeft = document.getElementById("match-left");
+  const matchRight = document.getElementById("match-right");
+  const checkMatchBtn = document.getElementById("check-match-btn");
+
+  const startBtn = document.getElementById("start-btn");
+  const restartBtn = document.getElementById("restart-btn");
+  const numQuestionsSelect = document.getElementById("num-questions-select");
+  const statsDiv = document.getElementById("stats");
+  const finalScoreText = document.getElementById("final-score");
+
+  let questions = [];
+  let currentQuestionIndex = 0;
+  let score = 0;
+  let timeLeft = 30;
+  let timerInterval;
+  let matchAnswers = {};
+
+  // Utility: shuffle array in place
+  function shuffle(array) {
+    for (let i = array.length -1; i > 0; i--) {
+      const j = Math.floor(Math.random()*(i+1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+  }
+
+  function loadStats() {
+    let results = JSON.parse(localStorage.getItem(storageKey)) || [];
+    if (results.length === 0) {
+      statsDiv.textContent = "No previous attempts recorded.";
+      return;
+    }
+    const totalAttempts = results.length;
+    const avgScore = (results.reduce((acc,r) => acc + r.score,0) / results.reduce((acc,r) => acc + r.total,0)) * 100;
+    const lastAttempt = results[results.length -1];
+    statsDiv.innerHTML = `
+      <p>Total attempts: <strong>${totalAttempts}</strong></p>
+      <p>Average score: <strong>${avgScore.toFixed(1)}%</strong></p>
+      <p>Last attempt: <strong>${lastAttempt.score} / ${lastAttempt.total}</strong> (${((lastAttempt.score/lastAttempt.total)*100).toFixed(1)}%)</p>
+    `;
+  }
+
+  function saveResult(scoreVal, totalVal) {
+    let results = JSON.parse(localStorage.getItem(storageKey)) || [];
+    results.push({ date: new Date().toISOString(), score: scoreVal, total: totalVal });
+    localStorage.setItem(storageKey, JSON.stringify(results));
+  }
+
+  function startTimer() {
+    timeLeft = 30;
+    timerDisplay.textContent = `Time: ${timeLeft}s`;
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      timerDisplay.textContent = `Time: ${timeLeft}s`;
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        if (questions[currentQuestionIndex].type === "multiple-choice") {
+          disableButtons();
+        } else {
+          disableMatching();
+        }
+        showNextButton();
+      }
+    }, 1000);
+  }
+
+  function showQuestion() {
+    resetState();
+    startTimer();
+
+    const currentQuestion = questions[currentQuestionIndex];
+    questionText.innerText = currentQuestion.question;
+
+    if (currentQuestion.type === "multiple-choice") {
+      matchingContainer.style.display = "none";
+      answerButtons.style.display = "block";
+
+      currentQuestion.answers.forEach(answer => {
+        const button = document.createElement("button");
+        button.innerText = answer.text;
+        button.classList.add("answer-btn");
+        button.dataset.correct = answer.correct;
+        button.addEventListener("click", selectAnswer);
+        answerButtons.appendChild(button);
+      });
+
+    } else if (currentQuestion.type === "matching") {
+      answerButtons.style.display = "none";
+      matchingContainer.style.display = "block";
+      checkMatchBtn.disabled = true;
+      matchAnswers = {};
+
+      // Clear previous items
+      matchLeft.innerHTML = "<h4>Terms</h4>";
+      matchRight.innerHTML = "<h4>Definitions</h4>";
+
+      // Shuffle right side
+      const shuffledRight = currentQuestion.pairs
+        .map(pair => pair.right)
+        .sort(() => Math.random() - 0.5);
+
+      // Create draggable left items
+      currentQuestion.pairs.forEach(pair => {
+        const div = document.createElement("div");
+        div.classList.add("draggable-item");
+        div.draggable = true;
+        div.id = "left-" + pair.left.replace(/\s+/g, '-');
+        div.textContent = pair.left;
+        div.addEventListener("dragstart", dragStart);
+        matchLeft.appendChild(div);
+      });
+
+      // Create droppable right items
+      shuffledRight.forEach(text => {
+        const div = document.createElement("div");
+        div.classList.add("droppable-item");
+        div.textContent = text;
+        div.dataset.expected = currentQuestion.pairs.find(p => p.right === text).left;
+        div.addEventListener("dragover", dragOver);
+        div.addEventListener("drop", drop);
+        div.addEventListener("dragleave", dragLeave);
+        matchRight.appendChild(div);
+      });
+      checkMatchBtn.style.display = "inline-block";
+    }
+  }
+
+  function resetState() {
+    clearInterval(timerInterval);
+    nextBtn.style.display = "none";
+    answerButtons.innerHTML = "";
+    checkMatchBtn.style.display = "none";
+    matchingContainer.style.display = "none";
+  }
+
+  function selectAnswer(e) {
+    clearInterval(timerInterval);
+    const selectedBtn = e.target;
+    const correct = selectedBtn.dataset.correct === "true";
+
+    if (correct) {
+      selectedBtn.classList.add("correct");
+      score++;
+    } else {
+      selectedBtn.classList.add("incorrect");
+      Array.from(answerButtons.children).forEach(button => {
+        if (button.dataset.correct === "true") {
+          button.classList.add("correct");
+        }
+      });
+    }
+    disableButtons();
+    showNextButton();
+  }
+
+  function disableButtons() {
+    Array.from(answerButtons.children).forEach(button => {
+      button.disabled = true;
+    });
+  }
+
+  function showNextButton() {
+    nextBtn.style.display = "block";
+  }
+
+  nextBtn.addEventListener("click", () => {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < questions.length) {
+      showQuestion();
+    } else {
+      quizComplete();
+    }
+  });
+
+  function quizComplete() {
+    questionContainer.style.display = "none";
+    scoreContainer.style.display = "block";
+    finalScoreText.innerHTML = `You scored <strong>${score} / ${questions.length}</strong> (${((score/questions.length)*100).toFixed(1)}%)`;
+    saveResult(score, questions.length);
+    loadStats();
+  }
+
+  restartBtn.addEventListener("click", () => {
+    scoreContainer.style.display = "none";
+    startScreen.style.display = "block";
+  });
+
+  // --- Drag & Drop Handlers ---
+
+  let draggedElement = null;
+
+  function dragStart(e)
