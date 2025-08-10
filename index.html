@@ -2,541 +2,404 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-<title>SC-900 Practice Exam Simulator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Clive Net SC-900 Practice Quiz</title>
 <style>
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-      Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-    margin: 0; padding: 0; background: #f5f7fa; color: #222;
-    display: flex; flex-direction: column; min-height: 100vh;
-  }
-  header {
-    background: #0078d4; color: white; padding: 1rem; text-align: center;
-    font-size: 1.4rem; font-weight: 600;
-  }
-  main {
-    flex-grow: 1;
-    max-width: 600px;
-    margin: 1rem auto;
-    padding: 0 1rem 2rem;
-  }
-  button {
-    background-color: #0078d4; border: none; color: white; padding: 0.6rem 1.2rem;
-    margin: 0.5rem 0.3rem; font-size: 1rem; border-radius: 5px;
-    cursor: pointer;
-    user-select: none;
-  }
-  button:disabled {
-    background-color: #a0a0a0;
-    cursor: not-allowed;
-  }
-  h1, h2 {
-    margin-bottom: 0.5rem;
-  }
-  .question-container {
-    background: white;
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
-    margin-bottom: 1rem;
-  }
-  .choices {
-    margin-top: 1rem;
-  }
-  .choice {
-    margin: 0.3rem 0;
-    user-select: none;
-  }
-  label {
-    cursor: pointer;
-  }
-  .scoreboard {
-    background: white;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-top: 1rem;
-    box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
-  }
-  .summary {
-    margin-top: 1rem;
-    font-weight: 600;
-  }
-  .start-screen {
-    text-align: center;
-  }
-  .number-select {
-    font-size: 1rem;
-    padding: 0.4rem 0.7rem;
-    margin-top: 0.5rem;
-  }
-  /* Drag & drop styles for matching questions */
-  .drag-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-  }
-  .drag-list, .drop-list {
-    background: #e3e9f4;
-    border-radius: 6px;
-    padding: 1rem;
-    width: 48%;
-    min-height: 150px;
-    margin-bottom: 1rem;
-  }
-  .drag-item {
-    background: white;
-    margin: 0.4rem 0;
-    padding: 0.6rem;
-    border-radius: 4px;
-    box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
-    user-select: none;
-    cursor: grab;
-  }
-  .drop-item {
-    background: white;
-    margin: 0.4rem 0;
-    padding: 0.6rem;
-    border-radius: 4px;
-    min-height: 32px;
-    box-shadow: inset 0 0 3px #ccc;
-  }
-  .drop-item.filled {
-    box-shadow: inset 0 0 5px #0078d4;
-    cursor: default;
-  }
-  /* Responsive */
-  @media (max-width: 420px) {
-    .drag-list, .drop-list {
-      width: 100%;
-    }
-    main {
-      margin: 1rem 0.5rem 2rem;
-    }
-  }
+  body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f4f6f8; color: #222; }
+  header { background: #003366; color: white; padding: 1em; text-align: center; }
+  main { max-width: 600px; margin: 1em auto; background: white; padding: 1.5em; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);}
+  h1 { margin-top: 0; }
+  button { background: #003366; color: white; border: none; padding: 0.7em 1.5em; border-radius: 5px; font-size: 1em; cursor: pointer; }
+  button:disabled { background: #999; cursor: default; }
+  .question-count { margin-bottom: 1em; }
+  .scoreboard { margin: 1em 0; font-weight: bold; }
+  .answers { list-style: none; padding: 0; }
+  .answers li { margin: 0.6em 0; }
+  .answers button { width: 100%; text-align: left; background: #eee; color: #222; }
+  .answers button.selected { background: #004080; color: white; }
+  .explanation { background: #e7f3fe; border-left: 5px solid #2196F3; padding: 0.5em 1em; margin-top: 1em; }
+  .footer { text-align: center; margin: 2em 0 1em 0; font-size: 0.9em; color: #555; }
+  select { padding: 0.3em; font-size: 1em; margin-bottom: 1em; }
+  .start-section { text-align: center; }
 </style>
 </head>
 <body>
-<header>SC-900 Practice Exam Simulator</header>
+
+<header>
+  <h1>Clive Net SC-900 Practice Quiz</h1>
+</header>
+
 <main>
-  <div id="start-screen" class="start-screen">
-    <h2>Welcome to your SC-900 practice!</h2>
-    <p>Choose how many questions you'd like to answer:</p>
-    <select id="numQuestions" class="number-select">
-      <option value="10">10 Questions</option>
-      <option value="20" selected>20 Questions</option>
-      <option value="50">50 Questions</option>
-      <option value="100">100 Questions</option>
-      <option value="all">All Questions (~220)</option>
-    </select>
-    <br />
+  <section id="start-section" class="start-section">
+    <label for="numQuestions">Choose number of questions:</label><br />
+    <select id="numQuestions">
+      <option value="10">10</option>
+      <option value="15" selected>15</option>
+      <option value="20">20</option>
+      <option value="50">50</option>
+      <option value="100">100</option>
+      <option value="200">200</option>
+    </select><br />
     <button id="startBtn">Start Quiz</button>
-    <div class="scoreboard" style="margin-top:1rem;">
-      <div><strong>Total quizzes taken:</strong> <span id="totalQuizzes">0</span></div>
-      <div><strong>Overall accuracy:</strong> <span id="overallAccuracy">0%</span></div>
-      <div><strong>Total questions answered:</strong> <span id="totalAnswered">0</span></div>
-      <div><strong>Total correct answers:</strong> <span id="totalCorrect">0</span></div>
+    <div style="margin-top:1em;">
+      <strong>Your Overall Score:</strong><br />
+      <span id="accScore">0</span> / <span id="accTotal">0</span> correct (<span id="accPercent">0</span>%)
     </div>
-  </div>
+  </section>
 
-  <div id="quiz-container" style="display:none;">
-    <div class="question-container">
-      <div id="questionText"></div>
-      <form id="choicesForm"></form>
-      <button id="submitAnswer" disabled>Submit Answer</button>
-      <div id="explanation" style="margin-top: 1rem; font-style: italic; display:none;"></div>
-    </div>
-    <div>
-      <button id="nextQuestion" style="display:none; margin-top:1rem;">Next Question</button>
-      <button id="endQuiz" style="display:none; margin-top:1rem;">End Quiz</button>
-    </div>
-  </div>
-
-  <div id="result-screen" style="display:none; text-align:center;">
-    <h2>Quiz Complete!</h2>
-    <p id="resultSummary"></p>
-    <button id="restartBtn">Try Again</button>
-  </div>
+  <section id="quiz-section" style="display:none;">
+    <div class="question-count" id="questionCount"></div>
+    <div id="questionText" style="font-weight:bold; margin-bottom: 1em;"></div>
+    <ul class="answers" id="answersList"></ul>
+    <button id="nextBtn" disabled>Next Question</button>
+    <div class="explanation" id="explanation" style="display:none;"></div>
+    <div class="scoreboard" id="scoreboard"></div>
+  </section>
 </main>
 
+<div class="footer">
+  Made by Clive's AI Trainer — for your SC-900 success!
+</div>
+
 <script>
-// Questions database (220+ examples with multiple types, including drag-and-drop)
-const questions = [
-  // Sample multiple choice questions:
-  {
-    type: "mcq",
-    question: "What does the Microsoft Secure Score measure?",
-    choices: [
-      "Your company's stock price",
-      "Your security health and improvement actions",
-      "Number of users with admin roles",
-      "Number of devices enrolled in Intune"
-    ],
-    answer: 1,
-    explanation: "Microsoft Secure Score measures your security posture and provides recommendations to improve it."
-  },
-  {
-    type: "mcq",
-    question: "Which Microsoft service provides identity and access management?",
-    choices: [
-      "Microsoft Defender",
-      "Microsoft Entra",
-      "Microsoft Teams",
-      "Azure DevOps"
-    ],
-    answer: 1,
-    explanation: "Microsoft Entra is the family of identity and access management services including Azure AD."
-  },
-  {
-    type: "truefalse",
-    question: "Multi-Factor Authentication (MFA) enhances security by requiring more than one proof of identity.",
-    answer: true,
-    explanation: "MFA requires multiple proofs like password + phone verification to improve security."
-  },
-  {
-    type: "dragdrop",
-    question: "Match the Microsoft security product with its primary function:",
-    dragItems: [
-      { id: "d1", text: "Microsoft Defender for Endpoint" },
-      { id: "d2", text: "Microsoft Purview" },
-      { id: "d3", text: "Azure AD Conditional Access" }
-    ],
-    dropItems: [
-      { id: "p1", text: "Endpoint protection and threat detection" },
-      { id: "p2", text: "Data governance and compliance" },
-      { id: "p3", text: "Access policies based on conditions" }
-    ],
-    answerMap: {
-      d1: "p1",
-      d2: "p2",
-      d3: "p3"
+(() => {
+  // Questions array
+  const questions = [
+    {
+      question: "Clive Industries wants to enforce Multi-Factor Authentication (MFA) for all users. Which Microsoft solution can help implement this easily?",
+      answers: [
+        { text: "Microsoft Defender for Endpoint", correct: false },
+        { text: "Azure Active Directory Conditional Access", correct: true },
+        { text: "Microsoft Intune", correct: false },
+        { text: "Microsoft Purview", correct: false }
+      ],
+      explanation: "Azure AD Conditional Access allows enforcing MFA policies based on user, location, device, and risk."
     },
-    explanation: "Defender for Endpoint protects devices; Purview manages compliance; Conditional Access controls access based on conditions."
-  },
-  // Additional questions to reach 220+ can be added here...
-];
+    {
+      question: "Which Microsoft compliance tool helps Clive Net identify and classify sensitive information in their environment?",
+      answers: [
+        { text: "Microsoft Defender", correct: false },
+        { text: "Microsoft Purview Data Loss Prevention (DLP)", correct: true },
+        { text: "Microsoft Sentinel", correct: false },
+        { text: "Azure Security Center", correct: false }
+      ],
+      explanation: "Microsoft Purview DLP helps classify, monitor, and protect sensitive info across services."
+    },
+    {
+      question: "Azure AD Identity Protection can automatically detect risky user sign-ins and respond to threats.",
+      answers: [
+        { text: "True", correct: true },
+        { text: "False", correct: false }
+      ],
+      explanation: "Azure AD Identity Protection uses signals to identify suspicious sign-ins and can enforce automated responses."
+    },
+    {
+      question: "Clive Net wants to control who can access their Azure resources by assigning permissions based on job roles. Which feature should they use?",
+      answers: [
+        { text: "Azure Policies", correct: false },
+        { text: "Azure Role-Based Access Control (RBAC)", correct: true },
+        { text: "Azure Firewall", correct: false },
+        { text: "Azure Monitor", correct: false }
+      ],
+      explanation: "RBAC allows granular permissions to be assigned based on roles."
+    },
+    {
+      question: "Which Microsoft solution integrates with Clive Industries' existing Microsoft 365 environment to help monitor security events?",
+      answers: [
+        { text: "Microsoft Defender for Identity", correct: false },
+        { text: "Microsoft Sentinel", correct: true },
+        { text: "Microsoft Cloud App Security", correct: false },
+        { text: "Microsoft Endpoint Manager", correct: false }
+      ],
+      explanation: "Microsoft Sentinel is a cloud-native SIEM that ingests data from many sources including Microsoft 365."
+    },
+    {
+      question: "Microsoft Secure Score provides personalized recommendations to improve your organization's security posture.",
+      answers: [
+        { text: "True", correct: true },
+        { text: "False", correct: false }
+      ],
+      explanation: "Secure Score analyzes your tenant's security configuration and suggests improvements."
+    },
+    {
+      question: "Clive Net wants to protect sensitive email data from accidental sharing outside the company. Which feature should they configure?",
+      answers: [
+        { text: "Azure Information Protection (AIP)", correct: true },
+        { text: "Microsoft Teams Guest Access", correct: false },
+        { text: "Microsoft Defender Antivirus", correct: false },
+        { text: "Azure AD B2B Collaboration", correct: false }
+      ],
+      explanation: "AIP enables labeling and encryption to protect emails and documents."
+    },
+    {
+      question: "Which Microsoft product provides a comprehensive view of compliance risks and regulatory requirements for Clive Industries?",
+      answers: [
+        { text: "Microsoft Defender for Endpoint", correct: false },
+        { text: "Microsoft Purview Compliance Manager", correct: true },
+        { text: "Azure Sentinel", correct: false },
+        { text: "Microsoft Intune", correct: false }
+      ],
+      explanation: "Compliance Manager helps assess and manage regulatory compliance."
+    },
+    {
+      question: "Conditional Access policies can include device compliance as a condition to allow access.",
+      answers: [
+        { text: "True", correct: true },
+        { text: "False", correct: false }
+      ],
+      explanation: "Device compliance from Intune can be a condition in Conditional Access policies."
+    },
+    {
+      question: "Clive Net is concerned about data residency and wants to ensure their data stays within Australia. Which Microsoft feature helps them comply with this?",
+      answers: [
+        { text: "Data Loss Prevention (DLP)", correct: false },
+        { text: "Azure Regions and Data Residency Options", correct: true },
+        { text: "Microsoft Defender for Cloud", correct: false },
+        { text: "Azure Sentinel", correct: false }
+      ],
+      explanation: "Azure allows selecting regions to keep data within certain geographic boundaries."
+    },
+    {
+      question: "Which identity model does Azure Active Directory follow?",
+      answers: [
+        { text: "Centralized Identity Model", correct: false },
+        { text: "Password-less Identity Model", correct: false },
+        { text: "Claims-based Identity Model", correct: true },
+        { text: "Federated Identity Model", correct: false }
+      ],
+      explanation: "Azure AD is based on claims-based identity allowing tokens to carry user info."
+    },
+    {
+      question: "Clive Industries wants to implement passwordless sign-in for their employees. Which method does Microsoft recommend?",
+      answers: [
+        { text: "SMS verification", correct: false },
+        { text: "Microsoft Authenticator app with phone sign-in", correct: true },
+        { text: "Email OTP", correct: false },
+        { text: "Security questions", correct: false }
+      ],
+      explanation: "Microsoft Authenticator app supports secure passwordless phone sign-in."
+    },
+    {
+      question: "Microsoft Defender for Endpoint is primarily used for endpoint detection and response (EDR).",
+      answers: [
+        { text: "True", correct: true },
+        { text: "False", correct: false }
+      ],
+      explanation: "Defender for Endpoint provides advanced threat detection on devices."
+    },
+    {
+      question: "Which Microsoft tool helps Clive Net manage compliance with GDPR and other regulations?",
+      answers: [
+        { text: "Microsoft Purview Data Lifecycle Management", correct: true },
+        { text: "Microsoft Sentinel", correct: false },
+        { text: "Azure Firewall", correct: false },
+        { text: "Azure AD Connect", correct: false }
+      ],
+      explanation: "Data Lifecycle Management helps automate retention and deletion policies."
+    },
+    {
+      question: "What is the main purpose of Microsoft Cloud App Security (MCAS)?",
+      answers: [
+        { text: "To protect endpoint devices", correct: false },
+        { text: "To provide visibility and control over cloud apps", correct: true },
+        { text: "To manage user identities", correct: false },
+        { text: "To enforce network firewall policies", correct: false }
+      ],
+      explanation: "MCAS provides discovery and control over cloud app usage and risks."
+    },
+    {
+      question: "Microsoft Information Protection (MIP) uses labels to classify and protect documents and emails.",
+      answers: [
+        { text: "True", correct: true },
+        { text: "False", correct: false }
+      ],
+      explanation: "Labels apply protections like encryption and visual markings."
+    },
+    {
+      question: "Clive Net wants to grant external partners limited access to their resources without giving full permissions. Which Azure AD feature should they use?",
+      answers: [
+        { text: "Azure AD B2B Collaboration", correct: true },
+        { text: "Azure AD B2C", correct: false },
+        { text: "Azure Information Protection", correct: false },
+        { text: "Azure Policy", correct: false }
+      ],
+      explanation: "B2B lets external users access resources using their own credentials."
+    },
+    {
+      question: "Which Microsoft service provides a cloud-native SIEM and SOAR solution?",
+      answers: [
+        { text: "Microsoft Sentinel", correct: true },
+        { text: "Microsoft Defender Antivirus", correct: false },
+        { text: "Azure Firewall", correct: false },
+        { text: "Microsoft Endpoint Manager", correct: false }
+      ],
+      explanation: "Sentinel is Microsoft's cloud-native SIEM/SOAR."
+    },
+    {
+      question: "Azure AD Premium P2 includes access to Privileged Identity Management (PIM).",
+      answers: [
+        { text: "True", correct: true },
+        { text: "False", correct: false }
+      ],
+      explanation: "PIM is a feature of Azure AD Premium P2 that manages just-in-time admin access."
+    },
+    {
+      question: "Clive Industries needs to ensure all devices accessing their data comply with company policies. Which tool should enforce this?",
+      answers: [
+        { text: "Microsoft Defender for Identity", correct: false },
+        { text: "Microsoft Intune", correct: true },
+        { text: "Azure AD Connect", correct: false },
+        { text: "Microsoft Purview", correct: false }
+      ],
+      explanation: "Intune manages device compliance and enforces policies."
+    },
 
-// For demo, we'll duplicate to reach 220+ questions:
-while (questions.length < 220) {
-  // Duplicate with slight modification so IDs don’t clash in drag/drop, etc.
-  const base = questions[questions.length % 4];
-  const newQ = JSON.parse(JSON.stringify(base));
-  if (newQ.type === "dragdrop") {
-    newQ.dragItems.forEach((d,i) => d.id = d.id + questions.length);
-    newQ.dropItems.forEach((d,i) => d.id = d.id + questions.length);
-    // Update answerMap keys too
-    const newMap = {};
-    for (const k in newQ.answerMap) {
-      newMap[k + questions.length] = newQ.answerMap[k] + questions.length;
+    // (Add remaining ~180 questions here following same format...)
+  ];
+
+  // Load accumulated score and total from localStorage or init
+  let accumulatedCorrect = parseInt(localStorage.getItem('accCorrect')) || 0;
+  let accumulatedTotal = parseInt(localStorage.getItem('accTotal')) || 0;
+
+  // State variables
+  let quizQuestions = [];
+  let currentIndex = 0;
+  let currentScore = 0;
+  let totalQuestions = 0;
+  let answered = false;
+
+  // DOM elements
+  const startSection = document.getElementById('start-section');
+  const quizSection = document.getElementById('quiz-section');
+  const numQuestionsSelect = document.getElementById('numQuestions');
+  const startBtn = document.getElementById('startBtn');
+  const questionCount = document.getElementById('questionCount');
+  const questionText = document.getElementById('questionText');
+  const answersList = document.getElementById('answersList');
+  const nextBtn = document.getElementById('nextBtn');
+  const explanationDiv = document.getElementById('explanation');
+  const scoreboard = document.getElementById('scoreboard');
+  const accScoreSpan = document.getElementById('accScore');
+  const accTotalSpan = document.getElementById('accTotal');
+  const accPercentSpan = document.getElementById('accPercent');
+
+  function updateAccumulatedScore() {
+    accScoreSpan.textContent = accumulatedCorrect;
+    accTotalSpan.textContent = accumulatedTotal;
+    accPercentSpan.textContent = accumulatedTotal ? ((accumulatedCorrect / accumulatedTotal) * 100).toFixed(1) : '0';
+  }
+  updateAccumulatedScore();
+
+  function shuffleArray(arr) {
+    // Fisher-Yates shuffle
+    for (let i = arr.length -1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i+1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
     }
-    newQ.answerMap = newMap;
   }
-  questions.push(newQ);
-}
 
-// State variables
-let quizQuestions = [];
-let currentQIndex = 0;
-let score = 0;
-let totalAnswered = 0;
-let totalCorrect = 0;
-let totalQuizzesTaken = parseInt(localStorage.getItem("totalQuizzesTaken")||"0");
-let totalQuestionsAnswered = parseInt(localStorage.getItem("totalQuestionsAnswered")||"0");
-let totalCorrectAnswers = parseInt(localStorage.getItem("totalCorrectAnswers")||"0");
-
-// Elements
-const startScreen = document.getElementById("start-screen");
-const quizContainer = document.getElementById("quiz-container");
-const resultScreen = document.getElementById("result-screen");
-const questionText = document.getElementById("questionText");
-const choicesForm = document.getElementById("choicesForm");
-const submitBtn = document.getElementById("submitAnswer");
-const nextBtn = document.getElementById("nextQuestion");
-const endBtn = document.getElementById("endQuiz");
-const explanationDiv = document.getElementById("explanation");
-const restartBtn = document.getElementById("restartBtn");
-const numQuestionsSelect = document.getElementById("numQuestions");
-
-const totalQuizzesSpan = document.getElementById("totalQuizzes");
-const overallAccuracySpan = document.getElementById("overallAccuracy");
-const totalAnsweredSpan = document.getElementById("totalAnswered");
-const totalCorrectSpan = document.getElementById("totalCorrect");
-
-// Initialize start screen scoreboard
-function updateScoreboard() {
-  totalQuizzesSpan.textContent = totalQuizzesTaken;
-  totalAnsweredSpan.textContent = totalQuestionsAnswered;
-  totalCorrectSpan.textContent = totalCorrectAnswers;
-  overallAccuracySpan.textContent =
-    totalQuestionsAnswered === 0
-      ? "0%"
-      : ((totalCorrectAnswers / totalQuestionsAnswered) * 100).toFixed(1) + "%";
-}
-updateScoreboard();
-
-function shuffleArray(arr) {
-  for(let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i+1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-}
-
-function startQuiz() {
-  const selected = numQuestionsSelect.value;
-  if(selected === "all") {
-    quizQuestions = questions.slice();
-  } else {
-    quizQuestions = questions.slice();
+  function startQuiz() {
+    totalQuestions = parseInt(numQuestionsSelect.value);
+    // Copy and shuffle questions
+    quizQuestions = [...questions];
     shuffleArray(quizQuestions);
-    quizQuestions = quizQuestions.slice(0, Number(selected));
+
+    // Trim to requested number
+    if (totalQuestions > quizQuestions.length) totalQuestions = quizQuestions.length;
+    quizQuestions = quizQuestions.slice(0, totalQuestions);
+
+    currentIndex = 0;
+    currentScore = 0;
+    answered = false;
+
+    startSection.style.display = 'none';
+    quizSection.style.display = 'block';
+    nextBtn.textContent = 'Next Question';
+    nextBtn.disabled = true;
+    explanationDiv.style.display = 'none';
+    scoreboard.textContent = '';
+    showQuestion();
   }
-  currentQIndex = 0;
-  score = 0;
-  startScreen.style.display = "none";
-  resultScreen.style.display = "none";
-  quizContainer.style.display = "block";
-  nextBtn.style.display = "none";
-  endBtn.style.display = "none";
-  submitBtn.disabled = true;
-  explanationDiv.style.display = "none";
-  loadQuestion();
-}
 
-function loadQuestion() {
-  explanationDiv.style.display = "none";
-  submitBtn.style.display = "inline-block";
-  nextBtn.style.display = "none";
-  endBtn.style.display = "none";
-  submitBtn.disabled = true;
-  choicesForm.innerHTML = "";
-  const q = quizQuestions[currentQIndex];
-  questionText.textContent = `Q${currentQIndex+1}: ${q.question}`;
-
-  if(q.type === "mcq") {
-    q.choices.forEach((choice, idx) => {
-      const choiceId = `choice${idx}`;
-      const div = document.createElement("div");
-      div.className = "choice";
-      const input = document.createElement("input");
-      input.type = "radio";
-      input.name = "answer";
-      input.id = choiceId;
-      input.value = idx;
-      input.addEventListener("change", () => submitBtn.disabled = false);
-      const label = document.createElement("label");
-      label.htmlFor = choiceId;
-      label.textContent = choice;
-      div.appendChild(input);
-      div.appendChild(label);
-      choicesForm.appendChild(div);
+  function showQuestion() {
+    answered = false;
+    nextBtn.disabled = true;
+    explanationDiv.style.display = 'none';
+    scoreboard.textContent = '';
+    questionCount.textContent = `Question ${currentIndex + 1} of ${totalQuestions}`;
+    let q = quizQuestions[currentIndex];
+    questionText.textContent = q.question;
+    answersList.innerHTML = '';
+    q.answers.forEach((ans, idx) => {
+      let li = document.createElement('li');
+      let btn = document.createElement('button');
+      btn.textContent = ans.text;
+      btn.type = 'button';
+      btn.onclick = () => selectAnswer(idx);
+      li.appendChild(btn);
+      answersList.appendChild(li);
     });
-  } else if (q.type === "truefalse") {
-    ["True", "False"].forEach((tf, idx) => {
-      const val = tf === "True";
-      const div = document.createElement("div");
-      div.className = "choice";
-      const input = document.createElement("input");
-      input.type = "radio";
-      input.name = "answer";
-      input.id = `tf${idx}`;
-      input.value = val;
-      input.addEventListener("change", () => submitBtn.disabled = false);
-      const label = document.createElement("label");
-      label.htmlFor = `tf${idx}`;
-      label.textContent = tf;
-      div.appendChild(input);
-      div.appendChild(label);
-      choicesForm.appendChild(div);
-    });
-  } else if (q.type === "dragdrop") {
-    // Clear form for drag & drop UI
-    choicesForm.innerHTML = "";
-    const dragContainer = document.createElement("div");
-    dragContainer.className = "drag-container";
-
-    const dragList = document.createElement("div");
-    dragList.className = "drag-list";
-    dragList.setAttribute("aria-label", "Draggable items");
-    dragList.textContent = "Drag these:";
-    dragList.style.marginBottom = "0.3rem";
-    dragContainer.appendChild(dragList);
-
-    const dropList = document.createElement("div");
-    dropList.className = "drop-list";
-    dropList.setAttribute("aria-label", "Drop targets");
-    dropList.textContent = "Match with these:";
-    dropList.style.marginBottom = "0.3rem";
-    dragContainer.appendChild(dropList);
-
-    // Shuffle drag items for randomness
-    const dragItems = [...q.dragItems];
-    shuffleArray(dragItems);
-
-    dragItems.forEach(item => {
-      const div = document.createElement("div");
-      div.className = "drag-item";
-      div.draggable = true;
-      div.id = item.id;
-      div.textContent = item.text;
-      div.addEventListener("dragstart", dragStart);
-      dragList.appendChild(div);
-    });
-
-    q.dropItems.forEach(item => {
-      const div = document.createElement("div");
-      div.className = "drop-item";
-      div.id = item.id;
-      div.dataset.expected = ""; // to fill later by answerMap
-      div.textContent = item.text;
-      div.addEventListener("dragover", dragOver);
-      div.addEventListener("drop", dropItem);
-      dropList.appendChild(div);
-    });
-
-    choicesForm.appendChild(dragContainer);
-    submitBtn.disabled = false; // Allow submit once all dragged (checked later)
-  }
-}
-
-function dragStart(ev) {
-  ev.dataTransfer.setData("text/plain", ev.target.id);
-}
-
-function dragOver(ev) {
-  ev.preventDefault();
-}
-
-function dropItem(ev) {
-  ev.preventDefault();
-  const dragId = ev.dataTransfer.getData("text/plain");
-  const dragElem = document.getElementById(dragId);
-  if (!dragElem) return;
-
-  // If drop area already filled, reject
-  if (ev.target.classList.contains("drop-item") && ev.target.classList.contains("filled")) {
-    return;
-  }
-  // If dragging item already dropped somewhere, remove it from old parent
-  if(dragElem.parentNode && dragElem.parentNode.classList.contains("drop-list")) {
-    dragElem.parentNode.removeChild(dragElem);
-  }
-  // Remove from drag list if dropping to drop-list
-  if(ev.target.classList.contains("drop-item")) {
-    // Remove dragElem from dragList container, append to drop target
-    dragElem.style.cursor = "default";
-    ev.target.appendChild(dragElem);
-    ev.target.classList.add("filled");
-  }
-}
-
-// Validate drag & drop answers before submit
-function validateDragDrop() {
-  const q = quizQuestions[currentQIndex];
-  const dropList = choicesForm.querySelector(".drop-list");
-  const filledDrops = dropList.querySelectorAll(".drop-item.filled");
-  return filledDrops.length === q.dropItems.length;
-}
-
-function getDragDropAnswer() {
-  const q = quizQuestions[currentQIndex];
-  const dropList = choicesForm.querySelector(".drop-list");
-  let userMap = {};
-  for(const dropItem of dropList.children) {
-    if(dropItem.classList.contains("filled") && dropItem.children.length === 1) {
-      userMap[dropItem.children[0].id] = dropItem.id;
-    }
-  }
-  return userMap;
-}
-
-submitBtn.addEventListener("click", () => {
-  const q = quizQuestions[currentQIndex];
-  submitBtn.disabled = true;
-
-  let userAnswer;
-  if(q.type === "mcq" || q.type === "truefalse") {
-    const selected = choicesForm.querySelector('input[name="answer"]:checked');
-    if(!selected) return;
-    userAnswer = q.type === "truefalse" ? (selected.value === "true") : parseInt(selected.value, 10);
-  } else if(q.type === "dragdrop") {
-    if(!validateDragDrop()) {
-      alert("Please match all items before submitting.");
-      submitBtn.disabled = false;
-      return;
-    }
-    userAnswer = getDragDropAnswer();
   }
 
-  // Check answer correctness
-  let correct = false;
-  if(q.type === "dragdrop") {
-    correct = true;
-    for(const dragId in q.answerMap) {
-      if(!userAnswer[dragId] || userAnswer[dragId] !== q.answerMap[dragId]) {
-        correct = false;
-        break;
+  function selectAnswer(idx) {
+    if (answered) return;
+    answered = true;
+    const q = quizQuestions[currentIndex];
+    const buttons = answersList.querySelectorAll('button');
+    buttons.forEach((btn, i) => {
+      btn.disabled = true;
+      if (i === idx) {
+        btn.classList.add('selected');
+        if (q.answers[i].correct) {
+          currentScore++;
+          scoreboard.textContent = "Correct! 🎉";
+          scoreboard.style.color = 'green';
+        } else {
+          scoreboard.textContent = "Incorrect. ❌";
+          scoreboard.style.color = 'red';
+        }
       }
+      else {
+        btn.classList.remove('selected');
+      }
+    });
+    explanationDiv.textContent = q.explanation;
+    explanationDiv.style.display = 'block';
+    nextBtn.disabled = false;
+  }
+
+  function nextQuestion() {
+    currentIndex++;
+    if (currentIndex >= totalQuestions) {
+      finishQuiz();
+    } else {
+      showQuestion();
+      nextBtn.disabled = true;
+      explanationDiv.style.display = 'none';
+      scoreboard.textContent = '';
     }
-  } else {
-    correct = userAnswer === q.answer;
   }
 
-  totalAnswered++;
-  if(correct) {
-    score++;
-    totalCorrect++;
+  function finishQuiz() {
+    alert(`Quiz complete! You scored ${currentScore} out of ${totalQuestions} (${((currentScore/totalQuestions)*100).toFixed(1)}%)`);
+
+    // Update accumulated scores
+    accumulatedCorrect += currentScore;
+    accumulatedTotal += totalQuestions;
+    localStorage.setItem('accCorrect', accumulatedCorrect);
+    localStorage.setItem('accTotal', accumulatedTotal);
+    updateAccumulatedScore();
+
+    // Reset UI
+    quizSection.style.display = 'none';
+    startSection.style.display = 'block';
   }
-  totalQuestionsAnswered++;
-  totalCorrectAnswers += correct ? 1 : 0;
 
-  explanationDiv.style.display = "block";
-  explanationDiv.textContent = correct ? "Correct! " + (q.explanation || "") : "Incorrect. " + (q.explanation || "");
-  submitBtn.style.display = "none";
-  nextBtn.style.display = currentQIndex < quizQuestions.length - 1 ? "inline-block" : "none";
-  endBtn.style.display = currentQIndex === quizQuestions.length - 1 ? "inline-block" : "none";
+  startBtn.addEventListener('click', startQuiz);
+  nextBtn.addEventListener('click', nextQuestion);
 
-  updateScoreboard();
-  localStorage.setItem("totalQuizzesTaken", totalQuizzesTaken.toString());
-  localStorage.setItem("totalQuestionsAnswered", totalQuestionsAnswered.toString());
-  localStorage.setItem("totalCorrectAnswers", totalCorrectAnswers.toString());
-});
-
-nextBtn.addEventListener("click", () => {
-  currentQIndex++;
-  explanationDiv.style.display = "none";
-  submitBtn.style.display = "inline-block";
-  nextBtn.style.display = "none";
-  endBtn.style.display = "none";
-  submitBtn.disabled = true;
-  loadQuestion();
-});
-
-endBtn.addEventListener("click", () => {
-  totalQuizzesTaken++;
-  localStorage.setItem("totalQuizzesTaken", totalQuizzesTaken.toString());
-  // Show final results
-  quizContainer.style.display = "none";
-  resultScreen.style.display = "block";
-  const percent = ((score / quizQuestions.length) * 100).toFixed(1);
-  document.getElementById("resultSummary").textContent =
-    `You answered ${score} out of ${quizQuestions.length} questions correctly (${percent}%).`;
-  updateScoreboard();
-});
-
-restartBtn.addEventListener("click", () => {
-  resultScreen.style.display = "none";
-  startScreen.style.display = "block";
-});
-
-document.getElementById("startBtn").addEventListener("click", startQuiz);
-
-// Extra: Confirm before leaving page to avoid accidental reload/loss of progress
-window.addEventListener("beforeunload", e => {
-  if (quizContainer.style.display === "block") {
-    e.preventDefault();
-    e.returnValue = "";
-  }
-});
+})();
 </script>
+
 </body>
 </html>
